@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Crawler</title>
+
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    
+    <script src="Scripts/jquery-2.1.0.min.js"></script>
+    <script src="Scripts/crawler-functions.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+
+
+</head>
+<body onload="loop();">
+    <br />
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Crawler State</div>
+                    <div class="panel-body" id="crawler-state">
+                        
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="StartCrawler()">Start</button>
+            <button class="btn btn-danger" onclick="StopCrawler()">Stop</button>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">RAM Available</div>
+                    <div class="panel-body" id="ram-available">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">CPU Utilization</div>
+                    <div class="panel-body" id="cpu-utilization">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Size of Queue</div>
+                    <div class="panel-body" id="size-of-queue">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Clear All</div>
+                    <div class="panel-body" id="feedback">
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="ClearAll()">Clear All</button>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" name='s' id='s' placeholder='Enter Url for title'>
+                    <span class="input-group-btn">
+                        <button class="btn btn-success" onclick="GetPageTitle()" type="button" id='search'>Search</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-xs-12 col-sm-8" id="resultSet">
+                <!-- data goes here -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
