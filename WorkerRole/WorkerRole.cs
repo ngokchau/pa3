@@ -95,38 +95,52 @@ namespace WorkerRole
 
         private void InsertIntoTable(string url)
         {
-            if (IsAllowedPath(url)) { 
-                string htmlRegex = @"^(http|https):\/\/[a-zA-Z0-9\-\.]+\.cnn\.com\/([a-zA-Z\d\/\.\-]+|\.cnn\.html|\.html|\.wtvr\.html|[a-zA-Z\d]+\?[a-zA-Z\=a-zA-Z\&+\=a-zA-z0-9]+|)$";
-                WebRequest request = WebRequest.Create(url);
-                Uri uri = new Uri(url);
+            if (IsAllowedPath(url)) {
 
-                HtmlAgilityPack.HtmlDocument htmlDoc = new HtmlAgilityPack.HtmlDocument();
-                htmlDoc.Load(request.GetResponse().GetResponseStream());
-
-                // These stuff goes in the table.
-                string title = htmlDoc.DocumentNode.SelectSingleNode("//head/title").InnerText;
-                string date = "";
-                if (htmlDoc.DocumentNode.SelectSingleNode("//head/meta[@http-equiv='last-modified']") != null) { 
-                    date = htmlDoc.DocumentNode.SelectSingleNode("//head/meta[@http-equiv='last-modified']").Attributes["content"].Value;
-                }
-                pageTable.CreateIfNotExists();
-                TableOperation insertOperation = TableOperation.InsertOrReplace(new PageInfo(HttpUtility.UrlEncode(url), title, date));
-                pageTable.Execute(insertOperation);
-
-                // Get all the links in the page.
-                HtmlNodeCollection links = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
-                foreach (HtmlNode link in links)
+                try
                 {
-                    string scheme = new Uri(uri, link.Attributes["href"].Value).Scheme.ToString();
-                    string host = new Uri(uri, link.Attributes["href"].Value).Host.ToString();
-                    string path = new Uri(uri, link.Attributes["href"].Value).PathAndQuery.ToString();
+                    string htmlRegex = @"^(http|https):\/\/[a-zA-Z0-9\-\.]+\.cnn\.com\/([a-zA-Z\d\/\.\-]+|\.cnn\.html|\.html|\.wtvr\.html|[a-zA-Z\d]+\?[a-zA-Z\=a-zA-Z\&+\=a-zA-z0-9]+|)$";
+                    WebRequest request = WebRequest.Create(url);
+                    Uri uri = new Uri(url);
 
-                    string s = scheme + "://" + host + path;
+                    HtmlAgilityPack.HtmlDocument htmlDoc = new HtmlAgilityPack.HtmlDocument();
+                    htmlDoc.Load(request.GetResponse().GetResponseStream());
 
-                    if (Regex.Match(s, htmlRegex).Success)
-                    {
-                        urlQueue.AddMessage(new CloudQueueMessage(s));
+                    // These stuff goes in the table.
+                    string title = "";
+                    if(htmlDoc.DocumentNode.SelectSingleNode("//head/title") != null) {
+                        title = htmlDoc.DocumentNode.SelectSingleNode("//head/title").InnerText;
                     }
+                    string date = "";
+                    if (htmlDoc.DocumentNode.SelectSingleNode("//head/meta[@http-equiv='last-modified']") != null) { 
+                        date = htmlDoc.DocumentNode.SelectSingleNode("//head/meta[@http-equiv='last-modified']").Attributes["content"].Value;
+                    }
+                    pageTable.CreateIfNotExists();
+                    TableOperation insertOperation = TableOperation.InsertOrReplace(new PageInfo(HttpUtility.UrlEncode(url), title, date));
+                    pageTable.Execute(insertOperation);
+
+                    // Get all the links in the page.
+                    HtmlNodeCollection links = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
+                    if (links != null)
+                    {
+                        foreach (HtmlNode link in links)
+                        {
+                            string scheme = new Uri(uri, link.Attributes["href"].Value).Scheme.ToString();
+                            string host = new Uri(uri, link.Attributes["href"].Value).Host.ToString();
+                            string path = new Uri(uri, link.Attributes["href"].Value).PathAndQuery.ToString();
+
+                            string s = scheme + "://" + host + path;
+
+                            if (Regex.Match(s, htmlRegex).Success)
+                            {
+                                urlQueue.AddMessage(new CloudQueueMessage(s));
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    // throw e;
                 }
             }
         }

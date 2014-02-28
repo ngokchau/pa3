@@ -112,6 +112,6 @@ function GetStats() {
 
 function loop() {
     GetStats();
-    setTimeout("loop()", 1000);
+    setTimeout("loop()", 3000);
 }
 setTimeout(GetStats(), 1000);
